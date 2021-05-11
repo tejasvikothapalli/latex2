@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>MathJax example</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+  <style>
+      label,
+      textarea {
+          font-size: .8rem;
+          letter-spacing: 1px;
+      }
+      textarea {
+          padding: 10px;
+          line-height: 1.5;
+          border-radius: 5px;
+          border: 1px solid #ccc;
+          box-shadow: 1px 1px 1px #999;
+          display: block;
+          margin-left: auto;
+          margin-right: auto;
+      }
+
+      label {
+          display: block;
+          margin-bottom: 10px;
+      }
+      .center {
+        text-align: center;
+        
+      }
+  </style>
+  <script>
+      function nextfunc() {
+
+          var formData = new FormData();
+          formData.append('image' , document.getElementById('img').files[0]);
+          jQuery.ajax({
+              url: 'https://im2latex-brian-tejas.herokuapp.com/predict',
+              cache: false,
+              processData:false,
+              contentType:false,
+              data: formData,
+              method: 'POST',
+              success: function(data){
+                  document.getElementById('story').value = data.markup;
+                  MathJax.typesetPromise().then(() => {
+                    document.getElementById('sauce').innerHTML = '$$'+data.markup + '$$'
+                    MathJax.typesetPromise();
+                  }).catch((err) => console.log(err.message));
+                  
+              }
+          });
+      }
+      function uploadFile() {
+          var blobFile = URL.createObjectURL(document.getElementById('img').files[0]);
+          var formData = new FormData();
+          formData.append("fileToUpload", blobFile);
+
+          $.ajax({
+             url: "http://127.0.0.1:5000/predict",
+             type: "POST",
+             data: JSON.stringify({'image': 'fds'}),
+             success: function(response) {
+                 alert("wow")
+             },
+             error: function(jqXHR, textStatus, errorMessage) {
+                 console.log(jqXHR, textStatus, errorMessage); // Optional
+             }
+          });
+      }
+     function myfunc(){
+
+         var objectURL = URL.createObjectURL(document.getElementById('img').files[0])
+         alert(objectURL);
+         $.ajax({
+            type: "GET",
+            url: 'http://127.0.0.1:5000/testing',
+            success: function(data){alert('hello done')}
+         });
+    }
+
+  </script>
+</head>
+<body>
+<label for="story" class = "center">Latex Code:</label>
+
+<textarea id="story" name="story"
+          rows="5" cols="33">
+\[W _ { \pm } = \int d ^ { 3 } x \; K _ { 0 } ^ { ( 2 ) } \left( t \rightarrow \pm \infty , \; \vec { x } \right) \; ,\]
+</textarea>
+<p id = 'sauce'>
+  \[W _ { \pm } = \int d ^ { 3 } x \; K _ { 0 } ^ { ( 2 ) } \left( t \rightarrow \pm \infty , \; \vec { x } \right) \; ,\]
+</p>
+
+
+<form action="/action_page.php">
+  <label for="img">Select image:</label>
+  <input type="file" id="img" name="img" accept="image/*">
+<button type="button" onclick = "nextfunc()">Click Me!</button>
+
+</form>
+
+
+
+</body>
+
+</html>
